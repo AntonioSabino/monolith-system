@@ -43,4 +43,25 @@ describe('ProductAdmFacade', () => {
 		expect(product.purchasePrice).toBe(10)
 		expect(product.stock).toBe(10)
 	})
+
+	it('should check stock', async () => {
+		const productAdmFacade = ProductAdmFacadeFactory.create()
+
+		const input = {
+			id: '2',
+			name: 'Product 2',
+			description: 'Product 2 description',
+			purchasePrice: 20,
+			stock: 20,
+		}
+
+		await productAdmFacade.addProduct(input)
+
+		const output = await productAdmFacade.checkStock({ productId: '2' })
+
+		expect(output).toEqual({
+			productId: '2',
+			stock: 20,
+		})
+	})
 })

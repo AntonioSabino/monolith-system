@@ -11,21 +11,21 @@ interface UseCasesProps {
 }
 
 export default class ProductAdmFacade implements ProductAdmFacadeInterface {
-	private addUseCase: UseCaseInterface
-	private stockUseCase: UseCaseInterface
+	private _addUseCase: UseCaseInterface
+	private _stockUseCase: UseCaseInterface
 
 	constructor({ addUseCase, stockUseCase }: UseCasesProps) {
-		this.addUseCase = addUseCase
-		this.stockUseCase = stockUseCase
+		this._addUseCase = addUseCase
+		this._stockUseCase = stockUseCase
 	}
 
 	async addProduct(input: AddProductFacadeInputDto): Promise<void> {
-		await this.addUseCase.execute(input)
+		await this._addUseCase.execute(input)
 	}
 
 	async checkStock(
 		input: CheckStockFacadeInputDto
 	): Promise<CheckStockFacadeOutputDto> {
-		return await this.stockUseCase.execute(input)
+		return await this._stockUseCase.execute(input)
 	}
 }
