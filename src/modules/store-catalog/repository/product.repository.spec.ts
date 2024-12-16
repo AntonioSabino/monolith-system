@@ -5,7 +5,7 @@ import ProductRepository from './product.repository'
 describe('ProductRepository test', () => {
 	let sequelize: Sequelize
 
-	beforeAll(async () => {
+	beforeEach(async () => {
 		sequelize = new Sequelize({
 			dialect: 'sqlite',
 			storage: ':memory:',
@@ -17,7 +17,7 @@ describe('ProductRepository test', () => {
 		await sequelize.sync()
 	})
 
-	afterAll(async () => {
+	afterEach(async () => {
 		await sequelize.close()
 	})
 
@@ -48,5 +48,30 @@ describe('ProductRepository test', () => {
 		expect(products[1].name).toBe('Product 2')
 		expect(products[1].description).toBe('Description 2')
 		expect(products[1].salesPrice).toBe(200)
+	})
+
+	it('should find a product', async () => {
+		await ProductModel.create({
+			id: '1',
+			name: 'Product 1',
+			description: 'Description 1',
+			salesPrice: 100,
+		})
+
+		const productRepository = new ProductRepository()
+		const product = await productRepository.find('1')
+
+		expect(product.id.value).toBe('1')
+		expect(product.name).toBe('Product 1')
+		expect(product.description).toBe('Description 1')
+		expect(product.salesPrice).toBe(100)
+	})
+
+	it('should throw an error when product not found', async () => {
+		const productRepository = new ProductRepository()
+
+		await expect(productRepository.find('21')).rejects.toThrow(
+			'Product not found'
+		)
 	})
 })
