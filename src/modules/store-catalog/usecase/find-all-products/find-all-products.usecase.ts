@@ -9,7 +9,7 @@ export default class FindAllProductsUsecase implements UseCaseInterface {
 
 		return {
 			products: products.map((product) => ({
-				id: product.id,
+				id: product.id.value,
 				name: product.name,
 				description: product.description,
 				salesPrice: product.salesPrice,

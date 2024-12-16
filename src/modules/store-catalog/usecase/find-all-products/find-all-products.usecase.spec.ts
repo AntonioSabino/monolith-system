@@ -18,8 +18,8 @@ const product2 = new Product({
 
 const MockRepository = () => {
 	return {
-		findAll: jest.fn().mockResolvedValue([product1, product2]),
 		find: jest.fn(),
+		findAll: jest.fn().mockReturnValue(Promise.resolve([product1, product2])),
 	}
 }
 
@@ -28,17 +28,17 @@ describe('find all products usecase', () => {
 		const repository = MockRepository()
 		const usecase = new FindAllProductsUsecase(repository)
 
-		const products = await usecase.execute()
+		const result = await usecase.execute()
 
 		expect(repository.findAll).toHaveBeenCalled()
-		expect(products.length).toBe(2)
-		expect(products[0].id).toBe('1')
-		expect(products[0].name).toBe('product 1')
-		expect(products[0].description).toBe('description 1')
-		expect(products[0].salesPrice).toBe(100)
-		expect(products[1].id).toBe('2')
-		expect(products[1].name).toBe('product 2')
-		expect(products[1].description).toBe('description 2')
-		expect(products[1].salesPrice).toBe(200)
+		expect(result.products.length).toBe(2)
+		expect(result.products[0].id).toBe('1')
+		expect(result.products[0].name).toBe('product 1')
+		expect(result.products[0].description).toBe('description 1')
+		expect(result.products[0].salesPrice).toBe(100)
+		expect(result.products[1].id).toBe('2')
+		expect(result.products[1].name).toBe('product 2')
+		expect(result.products[1].description).toBe('description 2')
+		expect(result.products[1].salesPrice).toBe(200)
 	})
 })
