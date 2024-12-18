@@ -1,4 +1,3 @@
-import e from 'express'
 import AddClientUseCase from './add-client.usecase'
 
 const MockRepository = () => {
