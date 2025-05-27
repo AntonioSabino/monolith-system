@@ -15,6 +15,8 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
 			throw new Error('Client not found')
 		}
 
+		await this.validateProducts(input)
+
 		return {
 			id: '',
 			invoiceId: '',
@@ -22,5 +24,14 @@ export default class PlaceOrderUseCase implements UseCaseInterface {
 			total: 0,
 			products: [],
 		}
+	}
+
+	private async validateProducts(input: PlaceOrderInputDto): Promise<void> {
+		if (input.products.length === 0) {
+			throw new Error('No products selected')
+		}
+
+		// Additional product validation logic can be added here
+		// For example, checking if products exist in the database
 	}
 }
