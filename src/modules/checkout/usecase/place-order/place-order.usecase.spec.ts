@@ -2,6 +2,63 @@ import { PlaceOrderInputDto } from './place-order.dto'
 import PlaceOrderUseCase from './place-order.usecase'
 
 describe('PlaceOrderUseCase', () => {
+	describe('validateProducts method', () => {
+		// @ts-expect-error - no params in constructor
+		const placeOrderUseCase = new PlaceOrderUseCase()
+		it('should throw an error when no products are selected', async () => {
+			const input: PlaceOrderInputDto = {
+				clientId: '1',
+				products: [],
+			}
+
+			await expect(
+				placeOrderUseCase['validateProducts'](input)
+			).rejects.toThrow(new Error('No products selected'))
+		})
+
+		it('should throw an error when products is out of stock', async () => {
+			const mockProductFacade = {
+				checkStock: jest.fn(({ productId }: { productId: string }) => {
+					if (productId === '0') {
+						return Promise.resolve({ productId, stock: 1 })
+					}
+					return Promise.resolve({ productId, stock: 0 })
+				}),
+			}
+
+			// @ts-expect-error - force set productFacade
+			placeOrderUseCase['_productFacade'] = mockProductFacade
+
+			let input: PlaceOrderInputDto = {
+				clientId: '0',
+				products: [{ productId: '1' }],
+			}
+
+			await expect(
+				placeOrderUseCase['validateProducts'](input)
+			).rejects.toThrow(new Error('Product 1 is not available in stock'))
+
+			input = {
+				clientId: '0',
+				products: [{ productId: '0' }, { productId: '1' }],
+			}
+
+			await expect(
+				placeOrderUseCase['validateProducts'](input)
+			).rejects.toThrow(new Error('Product 1 is not available in stock'))
+			expect(mockProductFacade.checkStock).toHaveBeenCalledTimes(3)
+
+			input = {
+				clientId: '0',
+				products: [{ productId: '0' }, { productId: '1' }, { productId: '2' }],
+			}
+
+			await expect(
+				placeOrderUseCase['validateProducts'](input)
+			).rejects.toThrow(new Error('Product 1 is not available in stock'))
+			expect(mockProductFacade.checkStock).toHaveBeenCalledTimes(5)
+		})
+	})
 	describe('execute method', () => {
 		it('should throw an error when client not found', async () => {
 			const mockClientFacade = {
