@@ -1,5 +1,5 @@
 import app from './express'
-import { initDB } from '../modules/@shared/infrastructure/database/sequelize'
+import { initDB } from '../database/sequelize'
 
 const port = process.env.PORT || 3000
 

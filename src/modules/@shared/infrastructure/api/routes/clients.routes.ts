@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import ClientAdmFacadeFactory from '../../modules/client-adm/factory/client-adm.facade.factory'
+import ClientAdmFacadeFactory from '../../../../client-adm/factory/client-adm.facade.factory'
 
 const clientsRouter = Router()
 const clientFacade = ClientAdmFacadeFactory.create()
