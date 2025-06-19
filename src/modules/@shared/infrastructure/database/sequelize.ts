@@ -29,6 +29,7 @@ export async function initDB() {
 
 	migration = migrator(sequelize)
 	await migration.up()
+	await sequelize.sync()
 }
 
 export async function closeDB() {
