@@ -180,12 +180,14 @@ describe('PlaceOrderUseCase', () => {
 				name: 'Client 1',
 				document: '12345678901',
 				email: 'client1@example.com',
-				street: 'Client Street',
-				number: '123',
-				complement: 'Apt 1',
-				city: 'Client City',
-				state: 'CS',
-				zipCode: '12345-678',
+				address: {
+					street: '123 Main St',
+					number: '456',
+					complement: 'Apt 789',
+					city: 'Cityville',
+					state: 'ST',
+					zipCode: '12345-678',
+				},
 			}
 
 			const mockClientFacade = {
@@ -283,6 +285,52 @@ describe('PlaceOrderUseCase', () => {
 				})
 
 				expect(mockInvoiceFacade.generate).toHaveBeenCalledTimes(0)
+			})
+
+			it('should be approved', async () => {
+				mockPaymentFacade.process = mockPaymentFacade.process.mockResolvedValue(
+					{
+						transactionId: '1t',
+						orderId: '1o',
+						amount: 300,
+						status: 'approved',
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					}
+				)
+
+				mockInvoiceFacade.generate =
+					mockInvoiceFacade.generate.mockResolvedValue({
+						id: '1c',
+					})
+
+				const input: PlaceOrderInputDto = {
+					clientId: clientProps.id,
+					products: [{ productId: '1' }, { productId: '2' }],
+				}
+
+				let output = await placeOrderUseCase.execute(input)
+
+				expect(output.invoiceId).toBe('1c')
+				expect(output.total).toBe(300)
+				expect(output.products).toStrictEqual([
+					{ productId: '1' },
+					{ productId: '2' },
+				])
+				expect(mockClientFacade.find).toHaveBeenCalledTimes(1)
+				expect(mockClientFacade.find).toHaveBeenCalledWith({
+					id: '1c',
+				})
+				expect(mockValidateProducts).toHaveBeenCalledWith(input)
+				expect(mockValidateProducts).toHaveBeenCalledTimes(1)
+				expect(mockGetProduct).toHaveBeenCalledTimes(2)
+				expect(mockCheckoutRepository.addOrder).toHaveBeenCalledTimes(1)
+				expect(mockPaymentFacade.process).toHaveBeenCalledTimes(1)
+				expect(mockPaymentFacade.process).toHaveBeenCalledWith({
+					orderId: output.id,
+					amount: output.total,
+				})
+				expect(mockInvoiceFacade.generate).toHaveBeenCalledTimes(1)
 			})
 		})
 	})
