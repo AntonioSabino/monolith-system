@@ -190,6 +190,7 @@ describe('PlaceOrderUseCase', () => {
 
 			const mockClientFacade = {
 				find: jest.fn().mockResolvedValue(clientProps),
+				add: jest.fn(),
 			}
 
 			const mockPaymentFacade = {
@@ -198,10 +199,12 @@ describe('PlaceOrderUseCase', () => {
 
 			const mockCheckoutRepository = {
 				addOrder: jest.fn(),
+				findOrder: jest.fn(),
 			}
 
 			const mockInvoiceFacade = {
-				create: jest.fn().mockResolvedValue({ id: '1i' }),
+				generate: jest.fn().mockResolvedValue({ id: '1i' }),
+				find: jest.fn(),
 			}
 
 			const placeOrderUseCase = new PlaceOrderUseCase(
@@ -268,7 +271,7 @@ describe('PlaceOrderUseCase', () => {
 					{ productId: '2' },
 				])
 				expect(mockClientFacade.find).toHaveBeenCalledTimes(1)
-				expect(mockValidateProducts).toHaveBeenCalledWith({ id: '1c' })
+				expect(mockValidateProducts).toHaveBeenCalledWith(input)
 				expect(mockValidateProducts).toHaveBeenCalledTimes(1)
 				expect(mockValidateProducts).toHaveBeenCalledWith(input)
 				expect(mockGetProduct).toHaveBeenCalledTimes(2)
@@ -279,7 +282,7 @@ describe('PlaceOrderUseCase', () => {
 					amount: output.total,
 				})
 
-				expect(mockInvoiceFacade.create).toHaveBeenCalledTimes(0)
+				expect(mockInvoiceFacade.generate).toHaveBeenCalledTimes(0)
 			})
 		})
 	})
