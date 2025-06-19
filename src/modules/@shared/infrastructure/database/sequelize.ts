@@ -1,11 +1,15 @@
 import { Sequelize } from 'sequelize-typescript'
 import { ClientModel } from '../../../client-adm/repository/client.model'
-import { ProductModel } from '../../../product-adm/repository/product.model'
+import ProductAdmModel from '../../../product-adm/repository/product.model'
+import StorageProductModel from '../../../store-catalog/repository/product.model'
 import TransactionModel from '../../../payment/repository/transaction.model'
 import { InvoiceModel } from '../../../invoice/repository/invoice.model'
 import InvoiceItemModel from '../../../invoice/repository/invoice-item.model'
+import { Umzug } from 'umzug'
+import { migrator } from './config-migrations/migrator'
 
 export let sequelize: Sequelize
+let migration: Umzug<any>
 
 export async function initDB() {
 	sequelize = new Sequelize({
@@ -16,17 +20,22 @@ export async function initDB() {
 
 	sequelize.addModels([
 		ClientModel,
-		ProductModel,
+		ProductAdmModel,
+		StorageProductModel,
 		TransactionModel,
 		InvoiceModel,
 		InvoiceItemModel,
 	])
 
-	await sequelize.sync({ force: true })
+	migration = migrator(sequelize)
+	await migration.up()
 }
 
 export async function closeDB() {
-	if (sequelize) {
-		await sequelize.close()
+	if (!migration || !sequelize) {
+		return
 	}
+	migration = migrator(sequelize)
+	await migration.down()
+	await sequelize.close()
 }
