@@ -9,18 +9,12 @@ export const migrator = (sequelize: Sequelize) => {
 				'*/database/migrations/*.ts',
 				{
 					cwd: join(__dirname, '../../../'),
-					ignore: [
-						'**/node_modules/**',
-						'**/*.d.ts',
-						'**/*.d.ts',
-						'**/index.ts',
-						'**/index.js',
-					],
+					ignore: ['**/*.d.ts', '**/index.ts', '**/index.js'],
 				},
 			],
 		},
-		storage: new SequelizeStorage({ sequelize }),
 		context: sequelize,
+		storage: new SequelizeStorage({ sequelize }),
 		logger: console,
 	})
 }

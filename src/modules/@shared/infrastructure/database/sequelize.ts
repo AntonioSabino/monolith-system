@@ -7,14 +7,15 @@ import { InvoiceModel } from '../../../invoice/repository/invoice.model'
 import InvoiceItemModel from '../../../invoice/repository/invoice-item.model'
 import { Umzug } from 'umzug'
 import { migrator } from './config-migrations/migrator'
+import { OrderModel } from '../../../checkout/repository/order.model'
 
 export let sequelize: Sequelize
-let migration: Umzug<any>
+export let umzug: Umzug<any>
 
 export async function initDB() {
 	sequelize = new Sequelize({
 		dialect: 'sqlite',
-		storage: ':memory:',
+		storage: './db.sqlite',
 		logging: false,
 	})
 
@@ -25,18 +26,21 @@ export async function initDB() {
 		TransactionModel,
 		InvoiceModel,
 		InvoiceItemModel,
+		OrderModel,
 	])
 
-	migration = migrator(sequelize)
-	await migration.up()
+	umzug = migrator(sequelize)
+
+	await umzug.up()
+
 	await sequelize.sync()
 }
 
 export async function closeDB() {
-	if (!migration || !sequelize) {
+	if (!umzug || !sequelize) {
 		return
 	}
-	migration = migrator(sequelize)
-	await migration.down()
+	umzug = migrator(sequelize)
+	await umzug.down()
 	await sequelize.close()
 }

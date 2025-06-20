@@ -17,7 +17,8 @@
     "test": "npm run tsc -- --noEmit && jest",
     "test:watch": "npm run tsc -- --noEmit && jest --watch",
     "tsc": "tsc",
-    "dev": "nodemon --watch src --exec ts-node src/modules/@shared/infrastructure/api/server.ts"
+    "dev": "nodemon --watch src --exec ts-node ./src/modules/@shared/infrastructure/api/server.ts",
+    "migrate": "node -r ts-node/register/transpile-only ./src/modules/@shared/infrastructure/database/config-migrations/migrator-cli.ts"
   },
   "dependencies": {
     "@types/express": "^4.17.13",
